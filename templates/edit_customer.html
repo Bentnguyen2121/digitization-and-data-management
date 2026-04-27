@@ -1,0 +1,88 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <a href="{{ url_for('dashboard') }}" class="btn btn-link text-decoration-none mb-3">
+                <i class="fas fa-arrow-left me-1"></i> Quay lại Dashboard
+            </a>
+
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-primary text-white p-3">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-user-edit me-2"></i>Chỉnh sửa thông tin khách hàng #{{ customer.id }}
+                    </h5>
+                </div>
+                <div class="card-body p-4">
+                    <form action="{{ url_for('edit_customer', id=customer.id) }}" method="POST">
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Độ tuổi</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
+                                    <input type="number" name="age" class="form-control" value="{{ customer.age }}" required>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Nghề nghiệp</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-briefcase"></i></span>
+                                    <input type="text" name="job" class="form-control" value="{{ customer.job }}" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Số dư tài khoản ($)</label>
+                                <div class="input-group">
+                                    <span class="input-group-text text-success fw-bold">$</span>
+                                    <input type="number" name="balance" class="form-control" value="{{ customer.balance }}" required>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Tình trạng hôn nhân</label>
+                                <input type="text" class="form-control bg-light" value="{{ customer.marital }}" readonly>
+                                <small class="text-muted">* Thông tin định danh không được sửa</small>
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <div class="d-flex justify-content-end gap-2">
+                            <a href="{{ url_for('customers_page') }}" class="btn btn-light">Hủy bỏ</a>
+                            <button type="submit" class="btn btn-primary px-4">
+                                <i class="fas fa-save me-2"></i>Lưu thay đổi
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="card mt-4 border-0 shadow-sm bg-light">
+                <div class="card-body">
+                    <h6 class="text-secondary small text-uppercase fw-bold mb-3">Thông tin dịch vụ</h6>
+                    <div class="row">
+                        <div class="col-6 col-md-3">
+                            <small class="text-muted d-block">Vay nhà</small>
+                            <span class="badge {% if customer.housing == 'yes' %}bg-danger{% else %}bg-secondary{% endif %}">
+                                {{ customer.housing | upper }}
+                            </span>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <small class="text-muted d-block">Vay cá nhân</small>
+                            <span class="badge {% if customer.loan == 'yes' %}bg-warning text-dark{% else %}bg-secondary{% endif %}">
+                                {{ customer.loan | upper }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

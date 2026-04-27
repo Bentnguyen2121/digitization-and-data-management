@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bank Management System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/all.min.css">
+    <style>
+        body { background-color: #f8f9fa; }
+        .navbar { z-index: 1000; }
+        /* Tùy chỉnh nhẹ cho thanh tìm kiếm */
+        .search-box { max-width: 250px; }
+        .form-control-search {
+            background-color: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white !important;
+        }
+        .form-control-search::placeholder { color: rgba(255, 255, 255, 0.5); }
+        .form-control-search:focus {
+            background-color: rgba(255, 255, 255, 0.2);
+            box-shadow: none;
+            border-color: #0dcaf0;
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
+        <div class="container-fluid">
+            <a class="navbar-brand fw-bold" href="/">
+                <i class="fas fa-university me-2 text-info"></i>BankSystem
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/"><i class="fas fa-chart-line me-1"></i> Phân tích</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/customers"><i class="fas fa-users me-1"></i> Khách hàng</a>
+                    </li>
+                </ul>
+
+                <div class="d-flex align-items-center gap-3">
+                    {% if session.get('logged_in') %}
+                        <form class="d-flex search-box me-2" action="{{ url_for('quick_search') }}" method="GET">
+                            <div class="input-group">
+                                <input class="form-control form-control-sm form-control-search" type="search" 
+                                       name="customer_id" placeholder="Tìm ID..." aria-label="Search">
+                                <button class="btn btn-sm btn-outline-info" type="submit">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
+                        </form>
+
+                        <div class="text-light me-2 border-end pe-3 d-none d-md-block">
+                            <small class="text-muted">Xin chào,</small> 
+                            <span class="fw-bold text-info">{{ session['username'] }}</span>
+                            <span class="badge bg-primary ms-1" style="font-size: 0.7rem;">{{ session['role'] | upper }}</span>
+                        </div>
+                        
+                        <a href="/logout" class="btn btn-sm btn-outline-danger">
+                            <i class="fas fa-sign-out-alt me-1"></i> Đăng xuất
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show shadow-sm" role="alert">
+                        <i class="fas {% if category=='danger' %}fa-exclamation-circle{% else %}fa-check-circle{% endif %} me-2"></i>
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

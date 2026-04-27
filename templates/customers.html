@@ -1,0 +1,176 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="h4 mb-0 text-primary"><i class="fas fa-users me-2"></i>Quản trị khách hàng</h2>
+        <div class="d-flex gap-2">
+            <a href="{{ url_for('export_excel') }}" class="btn btn-success text-nowrap shadow-sm">
+                <i class="fas fa-file-excel me-1"></i> Xuất Excel
+            </a>
+            <button class="btn btn-primary text-nowrap shadow-sm" data-bs-toggle="modal" data-bs-target="#addModal">
+                <i class="fas fa-plus me-1"></i> Thêm mới
+            </button>
+        </div>
+    </div>
+
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body">
+            <form action="/customers" method="GET" class="row g-3">
+                <div class="col-md-3">
+                    <label class="form-label small fw-bold text-secondary">Nghề nghiệp</label>
+                    <input type="text" name="job" class="form-control" placeholder="Tìm nghề nghiệp..." value="{{ search_job }}">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label small fw-bold text-secondary">Số dư từ ($)</label>
+                    <input type="number" name="min_bal" class="form-control" placeholder="0" value="{{ min_bal }}">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label small fw-bold text-secondary">Đến ($)</label>
+                    <input type="number" name="max_bal" class="form-control" placeholder="Max" value="{{ max_bal }}">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small fw-bold text-secondary">Hôn nhân</label>
+                    <select name="marital" class="form-select">
+                        <option value="">-- Tất cả --</option>
+                        <option value="single" {% if selected_marital == 'single' %}selected{% endif %}>Single</option>
+                        <option value="married" {% if selected_marital == 'married' %}selected{% endif %}>Married</option>
+                        <option value="divorced" {% if selected_marital == 'divorced' %}selected{% endif %}>Divorced</option>
+                    </select>
+                </div>
+                <div class="col-md-2 d-flex align-items-end gap-2">
+                    <button type="submit" class="btn btn-primary w-100 shadow-sm">Lọc</button>
+                    <a href="/customers" class="btn btn-outline-secondary w-100">Xóa</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card shadow-sm border-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-dark text-nowrap">
+                    <tr>
+                        <th style="width: 180px;">ID & Phân hạng</th> 
+                        <th>Tuổi</th>
+                        <th>Nghề nghiệp</th>
+                        <th>Hôn nhân</th>
+                        <th>Số dư hiện tại</th>
+                        <th>Vay nhà</th>
+                        <th>Tiết kiệm</th>
+                        <th class="text-center">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for c in customers %}
+                    <tr>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <div class="rounded-circle bg-{{ c.tier.color }} text-white d-flex align-items-center justify-content-center me-2 shadow-sm" style="width: 32px; height: 32px; min-width: 32px;">
+                                    <i class="fas {{ c.tier.icon }} fa-xs"></i>
+                                </div>
+                                <div>
+                                    <span class="fw-bold d-block text-dark">#{{ c.id }}</span>
+                                    <span class="badge bg-{{ c.tier.color }} text-white" style="font-size: 0.6rem; text-transform: uppercase; padding: 2px 5px;">
+                                        {{ c.tier.label }}
+                                    </span>
+                                </div>
+                            </div>
+                        </td>
+                        <td>{{ c.age }}</td>
+                        <td><span class="badge bg-light text-dark border">{{ c.job }}</span></td>
+                        <td class="text-capitalize">{{ c.marital }}</td>
+                        <td class="fw-bold text-primary">${{ "{:,.0f}".format(c.balance) }}</td>
+                        <td>
+                            {% if c.housing == 'yes' %}
+                                <span class="badge rounded-pill bg-danger-subtle text-danger px-2 border border-danger-subtle">
+                                    <i class="fas fa-home me-1"></i>Có vay
+                                </span>
+                            {% else %}
+                                <span class="badge rounded-pill bg-success-subtle text-success px-2 border border-success-subtle">
+                                    <i class="fas fa-check me-1"></i>Không
+                                </span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if c.deposit == 'yes' %}
+                                <span class="badge bg-success-subtle text-success border border-success">Đã mở</span>
+                            {% else %}
+                                <span class="badge bg-secondary-subtle text-secondary border">Chưa</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-center text-nowrap">
+                            <a href="/edit/{{ c.id }}" class="btn btn-sm btn-outline-warning shadow-sm" title="Chỉnh sửa">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <a href="/delete/{{ c.id }}" 
+                               class="btn btn-sm btn-outline-danger shadow-sm ms-1" 
+                               title="Xóa khách hàng"
+                               onclick="return confirm('Hành động này không thể hoàn tác. Bạn có chắc muốn xóa khách hàng #{{ c.id }} không?')">
+                                <i class="fas fa-trash"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="8" class="text-center py-5 text-muted">
+                            <i class="fas fa-search fa-3x mb-3 opacity-25"></i>
+                            <p>Không tìm thấy khách hàng nào phù hợp với bộ lọc của bạn.</p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="addModal" tabindex="-1" aria-labelledby="addModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="addModalLabel"><i class="fas fa-user-plus me-2"></i>Thêm khách hàng mới</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="/add_customer" method="POST">
+                <div class="modal-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold">Độ tuổi</label>
+                            <input type="number" name="age" class="form-control" required min="18" max="100">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold">Số dư ($)</label>
+                            <input type="number" name="balance" class="form-control" value="0" step="0.01">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label small fw-bold">Nghề nghiệp</label>
+                            <input type="text" name="job" class="form-control" required placeholder="Ví dụ: Engineer">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold">Hôn nhân</label>
+                            <select name="marital" class="form-select">
+                                <option value="single">Single</option>
+                                <option value="married">Married</option>
+                                <option value="divorced">Divorced</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold">Vay nhà</label>
+                            <select name="housing" class="form-select">
+                                <option value="no">Không</option>
+                                <option value="yes">Có vay</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" class="btn btn-primary">Lưu thông tin</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
